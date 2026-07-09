@@ -1,0 +1,51 @@
+# shear_deform.in
+# LAMMPS input script for high-strain-rate shear deformation of Al-Fe alloy using MACE
+
+units           metal
+boundary        p p p
+atom_style      atomic
+
+# 1. Load atomic structure
+# Usually we convert an XYZ structure to a LAMMPS data file using ASE: atoms.write('data.fe', format='lammps-data')
+read_data       data.fe
+
+# 2. Setup MACE interatomic potential
+# MACE pair style loads the model file and maps element Fe (type 1)
+pair_style      mace
+pair_coeff      * * Fe_Stage3_swa.model Fe
+
+neighbor        1.0 bin
+neigh_modify    every 1 delay 0 check yes
+
+# 3. Energy minimization
+echo            screen
+thermo          50
+thermo_style    custom step temp pe ke etotal press lx ly lz
+minimize        1.0e-6 1.0e-8 1000 10000
+
+# 4. Thermal Equilibration (NVT at 300 K)
+reset_timestep  0
+velocity        all create 300.0 12345 dist gaussian
+fix             1 all nvt temp 300.0 300.0 0.1
+run             5000
+unfix           1
+
+# 5. Non-Equilibrium Shear Deformation (High Strain-Rate)
+# We apply a shear strain rate of 1e10 s^-1 along the xy plane
+# 1e10 s^-1 = 0.01 ps^-1. TIMESTEP in metal units is 0.001 ps (1 fs).
+# Therefore, strain increment per step = 0.01 * 0.001 = 1e-5.
+variable        srate equal 0.01
+fix             1 all nvt temp 300.0 300.0 0.1
+fix             2 all deform 1 xy erate ${srate} units box remap v
+
+# Setup thermo output and dump files
+thermo          100
+thermo_style    custom step temp pe ke etotal press pxy lx ly lz
+# Dump configurations in custom format for OOD scanning (Extended XYZ or custom LAMMPS dump)
+dump            1 all custom 100 traj_shear.lammpstrj id type x y z fx fy fz
+dump_modify     1 sort id
+
+# Run deformation for 50,000 steps (50 ps, total shear strain = 0.5)
+run             50000
+
+print "=== Shear Deformation Simulation Complete ==="

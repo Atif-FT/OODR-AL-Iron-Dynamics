@@ -1,0 +1,48 @@
+# thermal_shock.in
+# LAMMPS input script for thermal shock simulation of Al-Fe alloy using MACE
+
+units           metal
+boundary        p p p
+atom_style      atomic
+
+# 1. Load atomic structure
+read_data       data.fe
+
+# 2. Setup MACE potential
+pair_style      mace
+pair_coeff      * * Fe_Stage3_swa.model Fe
+
+neighbor        1.0 bin
+neigh_modify    every 1 delay 0 check yes
+
+# 3. Energy minimization
+thermo          50
+minimize        1.0e-6 1.0e-8 1000 10000
+
+# 4. Initial Equilibration (NVT at 300 K)
+reset_timestep  0
+velocity        all create 300.0 54321 dist gaussian
+fix             1 all nvt temp 300.0 300.0 0.1
+run             5000
+unfix           1
+
+# 5. Thermal Shock (Sudden heating to 1200 K)
+# We simulate a sudden thermal spike by ramping temperature from 300 K to 1200 K
+# over a very short window of 1 ps (1000 steps), then running in NVE to observe relaxation.
+reset_timestep  0
+fix             1 all nvt temp 300.0 1200.0 0.05
+thermo          50
+run             1000
+unfix           1
+
+# 6. Relaxation Phase (NVE)
+# In NVE, total energy should be conserved. If the model is unstable, 
+# forces will explode and the simulation will crash (blow-up).
+# This is the ultimate test of MACE potential robustness.
+fix             2 all nve
+thermo          100
+thermo_style    custom step temp pe ke etotal press
+dump            1 all custom 100 traj_shock.lammpstrj id type x y z fx fy fz
+run             20000
+
+print "=== Thermal Shock Simulation Complete ==="
