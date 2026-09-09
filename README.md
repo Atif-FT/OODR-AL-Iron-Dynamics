@@ -1,6 +1,6 @@
 # OODR-AL: Active Learning of Equivariant Interatomic Potentials for Extreme Non-Equilibrium Iron Dynamics
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21275017.svg)](https://doi.org/10.5281/zenodo.21275017)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22671770.svg)](https://doi.org/10.5281/zenodo.22671770)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
@@ -71,7 +71,7 @@ This repository contains the complete source code, active-learning orchestration
 
 Due to size considerations, the complete Extended XYZ datasets (234 DFT training configurations and 20 OOD validation snapshots) and trained PyTorch/MACE model weights are permanently archived on **Zenodo**:
 
-- **Zenodo DOI:** [https://doi.org/10.5281/zenodo.21275017](https://doi.org/10.5281/zenodo.21275017)
+- **Zenodo DOI:** [https://doi.org/10.5281/zenodo.22671770](https://doi.org/10.5281/zenodo.22671770)
 
 Download the dataset and models from Zenodo and place them in `datasets/` and `models/` respectively.
 
