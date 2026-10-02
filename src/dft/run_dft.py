@@ -240,15 +240,9 @@ def run_calculation(structure_path: str,
         print(f"        Stress tensor on vacuum cells is INVALID for bulk Fe FF.")
         return False
 
-    # == Choose adaptive ecutwfc based on supercell size ========================
-    #   <= 16 atoms : 50 Ry  (standard BCC Fe, accurate)
-    #   >  16 atoms : 40 Ry  (large supercell, still accurate, saves RAM)
-    if n_atoms > 16:
-        ecutwfc_eff = 40.0
-        ecutrho_eff = 320.0
-    else:
-        ecutwfc_eff = 50.0
-        ecutrho_eff = 400.0
+    # == Production cutoffs for all supercells (consistent with 50/400 Ry PAW PBE) ===
+    ecutwfc_eff = 50.0
+    ecutrho_eff = 400.0
 
     # == Choose adaptive k-grid =================================================
     effective_kpts = _auto_kpts(atoms)

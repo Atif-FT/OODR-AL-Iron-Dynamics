@@ -28,10 +28,10 @@ fix             1 all nvt temp 1800.0 1800.0 0.1
 run             5000
 unfix           1
 
-# 5. Non-Equilibrium Shear Deformation (High Strain-Rate: 10^9 s^-1 = 0.001 ps^-1)
+# 5. Non-Equilibrium Shear Deformation (High Strain-Rate: 10^10 s^-1 = 0.01 ps^-1)
 # Timestep in metal units is 0.001 ps (1.0 fs).
-# 10,000 steps = 10.0 ps, corresponding to total shear strain gamma = 0.01 * 10 = 0.10 (10%).
-variable        srate equal 0.001
+# 10,000 steps = 10.0 ps, corresponding to total shear strain gamma = 0.01 ps^-1 * 10.0 ps = 0.10 (10%).
+variable        srate equal 0.01
 fix             1 all nvt temp 1800.0 1800.0 0.1
 fix             2 all deform 1 xy erate ${srate} units box remap v
 
@@ -41,7 +41,10 @@ thermo_style    custom step temp pe ke etotal press pxy lx ly lz
 dump            1 all custom 100 traj_shear.lammpstrj id type x y z fx fy fz
 dump_modify     1 sort id
 
-# Run shear deformation for 10,000 steps
-run             10000
+# Run shear deformation:
+# For the 10% shear test (Figure 5 & Figure 6), run 10,000 steps (10.0 ps at srate = 0.01 ps^-1).
+# For long-duration continuous shear stability testing (>50,000 steps, Table 1), set nsteps to 50000.
+variable        nsteps equal 10000
+run             ${nsteps}
 
 print "=== 1800 K Shear Deformation Simulation Complete ==="

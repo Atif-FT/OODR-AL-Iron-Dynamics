@@ -1,0 +1,7 @@
+ecutwfc_Ry,ecutrho_Ry,E_tot_eV_atom,delta_E_meV_atom,converged
+30,240,-4479.68,135.0,False
+40,320,-4479.795,20.0,False
+50,400,-4479.815,0.0,True
+60,480,-4479.818,3.0,True
+70,560,-4479.819,4.0,True
+90,720,-4479.82,5.0,True

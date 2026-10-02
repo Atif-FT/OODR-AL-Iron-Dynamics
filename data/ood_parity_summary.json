@@ -1,0 +1,13 @@
+{
+  "total_configs": 20,
+  "num_shock": 9,
+  "num_shear": 11,
+  "overall_energy_rmse_meV_atom": 78.53618565075904,
+  "shock_energy_rmse_meV_atom": 52.279473538524684,
+  "shear_energy_rmse_meV_atom": 94.7534403070421,
+  "overall_energy_mae_meV_atom": 71.67271022030945,
+  "overall_force_rmse_eV_A": 0.22054997109174543,
+  "overall_force_mae_eV_A": 0.14418985700617284,
+  "relative_force_rmse_percent": 33.59865706716849,
+  "relative_force_mae_percent": 166.57850203303414
+}

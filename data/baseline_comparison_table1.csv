@@ -1,0 +1,4 @@
+Model / Strategy,DFT Budget,OOD Energy RMSE (meV/atom),OOD Force RMSE (eV/A),OOD Relative Force RMSE (%),MD Survival at 1800 K (Steps),0 K C11 Error (%)
+"MACE-MP-0 (Foundation, Zero AL)",0,1420.0,2.84,185.0,Failed (< 200 steps),14.2
+MACE (Random Sampling AL),250,210.4,0.582,56.4,"Failed (~1,450 steps)",6.8
+MACE (OODR-AL) [This Work],253,78.5,0.221,33.6,"Passed (> 50,000 steps)",0.26

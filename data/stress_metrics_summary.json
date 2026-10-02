@@ -1,0 +1,7 @@
+{
+  "num_valid_frames_with_stress": 19,
+  "stress_rmse_GPa": 0.382,
+  "stress_mae_GPa": 0.274,
+  "stress_rmse_eV_A3": 0.0023842564664440114,
+  "stress_loss_weight_in_training": 0.05
+}

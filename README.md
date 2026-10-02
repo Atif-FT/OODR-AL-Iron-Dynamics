@@ -42,7 +42,7 @@ This repository contains the complete source code, active-learning orchestration
     │   └── generate_seed_dataset.py
     ├── lammps/                 # LAMMPS MD scripts for extreme shock & shear simulations
     │   ├── thermal_shock.in    # 1800 K thermal shock NVE relaxation
-    │   └── shear_deform.in     # 1800 K high strain-rate shear (10^9 s^-1)
+    │   └── shear_deform.in     # 1800 K high strain-rate simple shear (10^10 s^-1)
     └── visualization/          # Standalone publication figure generator
         └── generate_perfected_figures.py
 ```

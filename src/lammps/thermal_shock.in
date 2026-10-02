@@ -30,12 +30,14 @@ unfix           1
 reset_timestep  0
 velocity        all create 1800.0 12345 dist gaussian
 
-# 6. Microcanonical (NVE) Relaxation Phase (5.0 ps / 5,000 steps)
-# Total Hamiltonian energy (E_tot = E_pot + E_kin) is tracked to verify strict energy conservation
+# 6. Microcanonical (NVE) Relaxation Phase
+# For publication Figure 7 & Figure 8 analysis, 5,000 steps (5.0 ps) are sampled.
+# For long-duration stability benchmarking (>50,000 steps as reported in Table 1), set nsteps to 50000.
+variable        nsteps equal 50000
 fix             2 all nve
 thermo          100
 thermo_style    custom step temp pe ke etotal press
 dump            1 all custom 100 traj_shock.lammpstrj id type x y z fx fy fz
-run             5000
+run             ${nsteps}
 
 print "=== 1800 K Thermal Shock NVE Simulation Complete ==="
