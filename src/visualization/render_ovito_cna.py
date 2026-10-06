@@ -14,6 +14,7 @@ Methodology & Standards:
 - 3D crystallographic orientation tripod (x, y, z)
 - Color coding by Atomic Displacement Magnitude (Delta r in Angstroms, Viridis colormap)
 - Clean, transparent scientific presentation (no artificial borders, banners, or badges)
+- Ultra-legible typography (>2x font scaling for publication figures)
 - Adheres strictly to Nature Portfolio / npj Computational Materials Q1 publication standards
 
 Usage:
@@ -29,6 +30,7 @@ import shutil
 
 def render_raw_frames(traj_dir, raw_dir):
     """Render individual frame snapshots using the OVITO Pro Python API."""
+    import numpy as np
     from ovito.io import import_file
     from ovito.modifiers import CalculateDisplacementsModifier, ColorCodingModifier
     from ovito.vis import Viewport, TachyonRenderer, CoordinateTripodOverlay, ColorLegendOverlay, TextLabelOverlay
@@ -40,6 +42,7 @@ def render_raw_frames(traj_dir, raw_dir):
             "name": "dynamic_shear",
             "file": "dynamic_shear.xyz",
             "max_disp": 1.20,
+            "ticks_spacing": 0.40,
             "frames": [
                 (0, "(a)  t = 0.0 ps (\u03b3 = 0.00)", True),
                 (25, "(b)  t = 2.5 ps (\u03b3 = 0.025)", True),
@@ -50,6 +53,7 @@ def render_raw_frames(traj_dir, raw_dir):
             "name": "dynamic_shock",
             "file": "dynamic_shock.xyz",
             "max_disp": 1.60,
+            "ticks_spacing": 0.40,
             "frames": [
                 (0, "(a)  t = 0.0 ps", True),
                 (25, "(b)  t = 2.5 ps", True),
@@ -90,10 +94,17 @@ def render_raw_frames(traj_dir, raw_dir):
         vp.camera_pos = (21.0, -18.0, 15.0)
         vp.camera_dir = (-21.0 + 4.25, 18.0 + 4.25, -15.0 + 4.25)
         vp.fov = 0.6
-        vp.zoom_all()
+        vp.zoom_all(size=(1200, 1000))
 
-        # Coordinate tripod overlay showing x, y, z axes
-        tripod = CoordinateTripodOverlay(size=0.08, axis1_label='x', axis2_label='y', axis3_label='z')
+        # Camera position adjustment to ensure clean gap between atoms and enlarged colorbar
+        cam_dir = np.array(vp.camera_dir)
+        cam_pos = np.array(vp.camera_pos)
+        cam_pos = cam_pos - cam_dir * 3.5
+        cam_pos[2] -= 0.8
+        vp.camera_pos = tuple(cam_pos)
+
+        # Coordinate tripod overlay showing x, y, z axes positioned in bottom-left
+        tripod = CoordinateTripodOverlay(size=0.075, axis1_label='x', axis2_label='y', axis3_label='z', offset_x=0.02, offset_y=0.02)
         vp.overlays.append(tripod)
 
         tachyon = TachyonRenderer(
@@ -108,7 +119,7 @@ def render_raw_frames(traj_dir, raw_dir):
             label = TextLabelOverlay(
                 text=label_text,
                 alignment=33,  # Top-Left
-                font_size=0.045,
+                font_size=0.055,
                 text_color=(0.1, 0.1, 0.1),
                 offset_x=0.03,
                 offset_y=0.03
@@ -117,15 +128,18 @@ def render_raw_frames(traj_dir, raw_dir):
 
             cbar = None
             if add_cbar:
+                # Ultra-legible colorbar with enlarged font (>2x) and prominent tick labels
                 cbar = ColorLegendOverlay(
                     modifier=color_mod,
                     title="Atomic Displacement (\u00c5)",
                     format_string="%.2f",
                     alignment=68,  # Bottom-Center
-                    font_size=0.040,
-                    label_size=0.9,
-                    legend_size=0.42,
-                    offset_y=0.04
+                    font_size=0.082,
+                    label_size=1.05,
+                    legend_size=0.52,
+                    aspect_ratio=7.0,
+                    offset_y=0.035,
+                    ticks_enabled=False
                 )
                 vp.overlays.append(cbar)
 
@@ -145,7 +159,7 @@ def render_raw_frames(traj_dir, raw_dir):
 
         pipeline.remove_from_scene()
 
-def compose_figures(raw_dir, output_dirs):
+def compose_figures(raw_dir, output_dirs, extra_mappings=None):
     """Assemble 3-panel publication figures with pure white gutter and copy to destinations."""
     from PIL import Image
 
@@ -187,25 +201,42 @@ def compose_figures(raw_dir, output_dirs):
             shutil.copyfile(local_target, dest)
             print(f"[DEPLOY] Copied to: {dest}")
 
+    # Extra specific destination mappings (e.g. Figure_6_Atomistic_Shear_Evolution_OVITO.png)
+    if extra_mappings:
+        for src_name, target_path in extra_mappings.items():
+            src_file = os.path.join(raw_dir, src_name)
+            if os.path.exists(src_file):
+                os.makedirs(os.path.dirname(target_path), exist_ok=True)
+                shutil.copyfile(src_file, target_path)
+                print(f"[DEPLOY EXTRA] Copied {src_name} -> {target_path}")
+
 if __name__ == '__main__':
     script_dir = os.path.dirname(os.path.abspath(__file__))
     base_dir = os.path.abspath(os.path.join(script_dir, "..", ".."))
     traj_path = os.path.abspath(os.path.join(base_dir, "..", "06_Repositori_Data_Zenodo_Final", "trajectories"))
     raw_frames_dir = os.path.join(script_dir, "raw_cna_renders")
 
+    root_dir = os.path.abspath(os.path.join(base_dir, "..", ".."))
+
     target_output_dirs = [
         os.path.abspath(os.path.join(base_dir, "..", "01_Naskah_Artikel_Final")),
         os.path.abspath(os.path.join(base_dir, "..", "02_Naskah_Marked_Up_Final")),
         os.path.abspath(os.path.join(base_dir, "..", "04_Surat_Tanggapan_Reviewer_dan_Editor", "figures")),
-        os.path.abspath(os.path.join(traj_path, "review_images_cna"))
+        os.path.abspath(os.path.join(traj_path, "review_images_cna")),
+        os.path.abspath(os.path.join(root_dir, "!Upload Draft V3", "01_Manuscript_File_CLEAN", "LaTeX_Source_Package")),
     ]
+
+    extra_file_mappings = {
+        "Fig_OVITO_Shear.png": os.path.abspath(os.path.join(root_dir, "!Upload Draft V3", "05_Individual_Figures_HighRes", "Figure_6_Atomistic_Shear_Evolution_OVITO.png")),
+        "Fig_OVITO_Shock.png": os.path.abspath(os.path.join(root_dir, "!Upload Draft V3", "05_Individual_Figures_HighRes", "Figure_8_Atomistic_Shock_Relaxation_OVITO.png")),
+    }
 
     # CLI sub-commands
     if len(sys.argv) > 1 and sys.argv[1] == '--render-only':
         render_raw_frames(traj_path, raw_frames_dir)
         sys.exit(0)
     elif len(sys.argv) > 1 and sys.argv[1] == '--composite-only':
-        compose_figures(raw_frames_dir, target_output_dirs)
+        compose_figures(raw_frames_dir, target_output_dirs, extra_file_mappings)
         sys.exit(0)
 
     # Master pipeline:
@@ -229,7 +260,7 @@ if __name__ == '__main__':
 
     # 2. Compose using PIL
     try:
-        compose_figures(raw_frames_dir, target_output_dirs)
+        compose_figures(raw_frames_dir, target_output_dirs, extra_file_mappings)
         print("[SUCCESS] All genuine OVITO publication figures rendered and deployed successfully!")
     except ImportError:
         python_exe = sys.executable
