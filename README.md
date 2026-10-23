@@ -44,7 +44,7 @@ This repository contains the complete source code, active-learning orchestration
     │   ├── thermal_shock.in    # 1800 K thermal shock NVE relaxation
     │   └── shear_deform.in     # 1800 K high strain-rate simple shear (10^10 s^-1)
     └── visualization/          # Standalone publication figure generator
-        └── generate_perfected_figures.py
+        └── plot_figures.py
 ```
 
 ---
@@ -81,7 +81,7 @@ Download the dataset and models from Zenodo and place them in `datasets/` and `m
 
 To regenerate all 8 publication-grade figures (300 DPI):
 ```bash
-python src/visualization/generate_perfected_figures.py
+python src/visualization/plot_figures.py
 ```
 
 ---
